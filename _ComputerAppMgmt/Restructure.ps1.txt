@@ -1,0 +1,71 @@
+Try{
+    Import-Module ActiveDirectory
+    $GeneralSettings = Get-Content -Path (join-path $PSScriptRoot Generalsettings.json) | ConvertFrom-Json
+    $baseDirectory = (get-item $PSScriptRoot).parent
+    $AppMgmtOU = Get-ADOrganizationalUnit $GeneralSettings.AppMgmtOU
+    echo "Using AppMgmtOU: $($AppMgmtOU.DistinguishedName)"
+    echo "Using Directory: $($baseDirectory.fullname)"
+    
+    foreach ($mydir in $baseDirectory.GetDirectories() ) {
+        #Skip directories that start with an underscore
+        if ( $mydir.Name.StartsWith("_") ) { continue }
+        #Skip if exception defined
+        #if ( $GeneralSettings.AppMgmtExceptions.Contains($mydir.Name) )  { continue }
+        
+        <#
+		foreach( $source in (Get-childItem (join-path $mydir.FullName 'Sources'))) {
+            $source.FullName
+            move-item $source.FullName $mydir.FullName -Verbose 
+        }
+        #>
+        
+        <#
+        $Prd = $baseDirectory.GetDirectories($mydir).GetDirectories('_Prod')
+        if ( -not $Prd) { continue }
+        $Packages = $Prd.GetDirectories() 
+        if ( -not $Packages) { continue }
+        foreach($package in $Packages) {
+            $Packages.FullName
+            $tomove = Get-childItem $package.FullName
+            $dst = join-Path $package.FullName "ADTP"
+            mkdir $dst 
+            foreach($src in $tomove){
+                move-item $src.FullName $dst -Verbose 
+            }
+        }
+        #>
+
+        <#$src = Join-path $mydir.FullName "Docs"
+        if (get-item $src -ErrorAction SilentlyContinue) {
+            move-item $src (join-path $mydir.FullName "_Docs" ) -Verbose 
+        }#>
+        
+        $Prd = $mydir.GetDirectories('_Prod')
+        if ( -not $Prd) { continue }
+        $Packages = $Prd.GetDirectories() 
+        if ( -not $Packages) { continue }
+        foreach($package in $Packages) {
+            $Packages.FullName
+            $src = join-Path $PSScriptRoot "4 Create SCCM Application.ps1"
+            #$dst = join-Path $package.FullName "ADTP"
+            $dst = $package.FullName 
+            Copy-Item $src $dst  -Verbose
+            $src = join-Path $PSScriptRoot "ServiceUIWrapper.ps1"
+            $dst = join-path $package.FullName  "ADTP"
+            Copy-Item $src $dst  -Verbose
+            powershell -file "$(join-path $package.FullName  "4 Create SCCM Application.ps1")"
+        }
+        <#
+        $Prd = $mydir.GetDirectories('_Prod')
+        if ( -not $Prd) { 
+            write-host $mydir
+            continue 
+        }
+        $Packages = $Prd.GetDirectories() 
+        if ( -not $Packages) { write-host $mydir }
+        #>
+    }
+
+} Catch {
+    throw $_
+}

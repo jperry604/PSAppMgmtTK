@@ -1,0 +1,6 @@
+[submodule "__Template_Vendor_AppName"]
+	path = __Template_Vendor_AppName
+	url = https://github.com/jperry604/PSAppMgmtTK-AppPackgeTemplate
+[submodule "_Lib/Microsoft-Win32-Content-Prep-Tool"]
+	path = _Lib/Microsoft-Win32-Content-Prep-Tool
+	url = https://github.com/microsoft/Microsoft-Win32-Content-Prep-Tool.git

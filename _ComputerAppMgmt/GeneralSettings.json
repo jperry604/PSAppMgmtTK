@@ -1,0 +1,32 @@
+{
+    "AppMgmtOU": "OU=AppInstallsManaged,DC=Contoso,DC=com",
+    "WorkstationOUs": ["OU=Computers,DC=Contoso,DC=com","OU=Workstations,DC=Contoso,DC=com"],
+	"AppMgmtExceptions": ["ITS_NotDisplayedPackage1","ITS_NotDisplayedPackage2"],
+    "PredefinedGroups": {
+        "WRK Base Software": [ "ITS_StartMenuLayout", "Microsoft_Company Portal", "ITS_FileAssociationDefaults", "Microsoft_Visual C++ Redistributable 2015-2019 x86", "Microsoft_Visual C++ Redistributable 2015-2019 x64", "Lansweeper_LsAgent", "Goverlan_ReachClient", "Microsoft_.NET3.x", "Microsoft_OfficeStd2016x86", "Igor Pavlov_7-Zip", "Adobe_AcrobatReader", "Cisco_ViewmailForOutlook x86", "Citrix_Workspace", "Microsoft_LAPS", "dotPDN_Paint.NET", "Microsoft_Teams"]
+    },
+    "MECM": {
+        "Servers": [
+            {
+                "FQDN":"MECM.Contoso.com",
+                "SiteCode":"DNV",
+                "BaseCollections":[
+                    {"Type":"APPi","BaseCollectionName":"APPi-PSAppMgmtTK-LC"},
+                    {"Type":"APPu","BaseCollectionName":"APPu-PSAppMgmtTK-LC"},
+                    {"Type":"APPie","BaseCollectionName":"APPie-PSAppMgmtTK-LC"},
+                    {"Type":"APPa","BaseCollectionName":"APPa-PSAppMgmtTK-LC"},
+                    {"Type":"APPaTesters","BaseCollectionName":"APPa-PSAppMgmtTK-LC"},
+                    {"Type":"APPiTesters","BaseCollectionName":"APPi-PSAppMgmtTK-LC"},
+                    {"Type":"ADGRP","BaseCollectionName":"ADGRP-PSAppMgmtTK-LC"},
+                    {"Type":"AllPrdAvailable","BaseCollectionName":"AllPrdAvailable-PSAppMgmtTK"},
+                    {"Type":"AllAvailable","BaseCollectionName":"AllAvailable-PSAppMgmtTK"}
+                ],
+                "ADQueryCollectionsFolder":"PSAppMgmtTK\\ADGroupMemships",
+                "AppDeploymentCollectionsFolder":"PSAppMgmtTK\\Deployments",
+                "PatchMyPC" : {
+                    "SourceFolder":"\\\\mecm.Contoso.com\\SOURCES\\PMPC-Sources"
+                }
+            }
+        ]
+    }
+}

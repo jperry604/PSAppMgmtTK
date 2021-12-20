@@ -1,0 +1,2 @@
+"%~dp0..\..\_Tools\IntuneWinAppUtil.exe"  -c "%~dp0ADTP" -s "Deploy-Application.exe" -o "%~dp0Intune Package"
+timeout 10
