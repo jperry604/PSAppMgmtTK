@@ -1,0 +1,15 @@
+<ApplicationInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ToolVersion="1.8.2.0">
+  <Name>Deploy-Application.exe</Name>
+  <UnencryptedContentSize>210328</UnencryptedContentSize>
+  <FileName>IntunePackage.intunewin</FileName>
+  <SetupFile>Deploy-Application.exe</SetupFile>
+  <EncryptionInfo>
+    <EncryptionKey>9oWDu9SON1BzJOf7oWAS5ulWJJDDrjVM53yob1XWghA=</EncryptionKey>
+    <MacKey>Jrq4wnvmIEimaZO5CB77UjlDwG+goTXd5FT7GayQibg=</MacKey>
+    <InitializationVector>1yaH8/1QGRgmYjxuPKgsBg==</InitializationVector>
+    <Mac>6XL1jZi/17IEtRR+4cpo5MR+gYqv3r8w1axWp/+Sr9A=</Mac>
+    <ProfileIdentifier>ProfileVersion1</ProfileIdentifier>
+    <FileDigest>SYY59j8Ll84beWxbcvRsXkDtydqxoNvpIB1n8LG9WmM=</FileDigest>
+    <FileDigestAlgorithm>SHA256</FileDigestAlgorithm>
+  </EncryptionInfo>
+</ApplicationInfo>

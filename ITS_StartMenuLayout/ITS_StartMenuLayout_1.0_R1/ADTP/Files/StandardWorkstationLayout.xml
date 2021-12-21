@@ -1,0 +1,43 @@
+<LayoutModificationTemplate
+    xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification"
+    xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout"
+    xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout"
+    xmlns:taskbar="http://schemas.microsoft.com/Start/2014/TaskbarLayout"
+    Version="1">
+	<LayoutOptions StartTileGroupCellWidth="8" StartTileGroupsColumnCount="1" />
+	<DefaultLayoutOverride LayoutCustomizationRestrictionType="OnlySpecifiedGroups">
+	<StartLayoutCollection>
+		<defaultlayout:StartLayout GroupCellWidth="8">
+			<start:Group Name="Corporate">
+				<start:DesktopApplicationTile Size="2x2" Column="0" Row="0" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Outlook 2016.lnk" />
+				<start:DesktopApplicationTile Size="2x2" Column="0" Row="0" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Outlook.lnk" />
+				<start:DesktopApplicationTile Size="2x2" Column="2" Row="0" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Word 2016.lnk" />
+				<start:DesktopApplicationTile Size="2x2" Column="2" Row="0" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Word.lnk" />
+				<start:DesktopApplicationTile Size="2x2" Column="4" Row="0" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Excel 2016.lnk" />
+				<start:DesktopApplicationTile Size="2x2" Column="4" Row="0" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Excel.lnk" />
+				<start:DesktopApplicationTile Size="2x2" Column="6" Row="0" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Open Text\DM Extensions\eDocs.lnk" />
+				<start:DesktopApplicationTile Size="2x2" Column="0" Row="2" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" />
+				<start:DesktopApplicationTile Size="1x1" Column="2" Row="2" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\PowerPoint 2016.lnk" />
+				<start:DesktopApplicationTile Size="1x1" Column="2" Row="2" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\PowerPoint.lnk" />
+				<start:DesktopApplicationTile Size="2x2" Column="4" Row="2" DesktopApplicationLinkPath="%APPDATA%\Microsoft\Windows\Start Menu\Programs\System Tools\computer.lnk" />
+				<start:Tile                   Size="2x2" Column="6" Row="2" AppUserModelID="Microsoft.CompanyPortal_8wekyb3d8bbwe!App" />
+				<start:DesktopApplicationTile Size="1x1" Column="0" Row="4" DesktopApplicationLinkPath="%APPDATA%\Microsoft\Windows\Start Menu\Programs\Microsoft Teams.lnk" />
+				<start:DesktopApplicationTile Size="1x1" Column="5" Row="4" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Tempest Live.lnk" />
+				<start:DesktopApplicationTile Size="1x1" Column="6" Row="4" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Tidemark.lnk" />
+				<start:DesktopApplicationTile Size="1x1" Column="7" Row="4" DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Hubble\Hubble\Hubble.lnk" />
+			</start:Group>
+	  </defaultlayout:StartLayout>
+	</StartLayoutCollection>
+	</DefaultLayoutOverride>
+	<CustomTaskbarLayoutCollection PinListPlacement="Replace">
+		<defaultlayout:TaskbarLayout>
+			<taskbar:TaskbarPinList>
+				<taskbar:DesktopApp DesktopApplicationLinkPath="C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Outlook 2016.lnk" />
+				<taskbar:DesktopApp DesktopApplicationLinkPath="C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Outlook.lnk" />
+				<taskbar:DesktopApp DesktopApplicationLinkPath="C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk"/>
+				<taskbar:DesktopApp DesktopApplicationLinkPath="C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Open Text\DM Extensions\eDocs.lnk" />
+				<taskbar:DesktopApp DesktopApplicationLinkPath="%APPDATA%\Microsoft\Windows\Start Menu\Programs\System Tools\File Explorer.lnk" />
+			</taskbar:TaskbarPinList>
+		</defaultlayout:TaskbarLayout>
+	</CustomTaskbarLayoutCollection>  
+</LayoutModificationTemplate>

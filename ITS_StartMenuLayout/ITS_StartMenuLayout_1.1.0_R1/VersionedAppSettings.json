@@ -1,0 +1,25 @@
+{
+    "MECM": {
+        "InstallCmdLine":   "powershell -executionpolicy bypass -file Deploy-Application.ps1  -DeploymentType Install   -DeployMode Silent         -AllowRebootPassThru" ,
+        "UninstallCmdLine": "powershell -executionpolicy bypass -file Deploy-Application.ps1  -DeploymentType Uninstall -DeployMode Silent         -AllowRebootPassThru",
+        "RepairCommandLine":"powershell -executionpolicy bypass -file Deploy-Application.ps1  -DeploymentType Repair    -DeployMode NonInteractive -AllowRebootPassThru",
+        "PSADTKDeployModeOneOf":["Silent","Interactive", "NonInteractive"],
+        "UninstallOldVersionFirst":false,
+        "MaximumRuntimeMins":60,
+        "LogonRequirementType":"WhetherOrNotUserLoggedOn",
+        "LogonRequirementTypeOneOf":["OnlyWhenUserLoggedOn", "WhereOrNotUserLoggedOn", "WhetherOrNotUserLoggedOn", "OnlyWhenNoUserLoggedOn"],
+        "UserInteractionMode":"Hidden",
+        "UserInteractionModeOneOf":["Normal", "Minimized", "Maximized", "Hidden"],
+        "RebootBehavior":"BasedOnExitCode",
+        "RebootBehaviorOneOf":["BasedOnExitCode","NoAction", "ProgramReboot", "ForceReboot"],
+        "DeploymentSettings":{
+            "AllowRepairApp":false,
+            "EnableSoftDeadline":false,
+            "OverrideServiceWindow":false,
+            "RebootOutsideServiceWindow":false,
+            "TimeBaseOn":"LocalTime",
+            "UserNotification":"DisplaySoftwareCenterOnly",
+            "UserNotificationOneOf":["DisplayAll", "DisplaySoftwareCenterOnly", "HideAll"]
+        }
+    }
+}

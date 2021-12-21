@@ -156,6 +156,7 @@ function Get-UserInputGui([string]$Message, [string]$WindowTitle, [string]$Defau
     foreach ($dir in $baseDirectory.GetDirectories() ) {
         #Skip directories that start with an underscore
         if ( $dir.Name.StartsWith("_") ) { continue }
+        if ( $dir.Name -eq ".git" ) { continue }
         #Skip if exception defined
         if ( $GeneralSettings.AppMgmtExceptions.Contains($dir.Name) )  { continue }
         #Add Software to Selectable list
@@ -331,9 +332,21 @@ if ($GuiInput.SoftwareGroup -eq "Use Selection Below") {
 $ProductionPackage = @{}
 foreach ($software in $SoftwareList) {
     try{
-        $Packages = $baseDirectory.GetDirectories($software).GetDirectories('_Prod').GetDirectories()
-        if (-not $packages) {throw "no packages found"}
-        $ProductionPackage.add($software, $Packages)
+        
+        $PathToApp = join-path $baseDirectory $software
+        $AppSettings = Get-Content -Path (join-path $PathToApp "AppSettings.json") | ConvertFrom-Json
+        
+        if ( $AppSettings.ProductionPackages ) { 
+            foreach($productionPackageJson in $AppSettings.ProductionPackages){
+                
+                $Package = get-item (join-path $PathToApp $productionPackageJson)
+                
+                $ProductionPackage.add($software, $Package)        
+            }
+
+        } else {
+            throw "no packages found"
+        }
     } catch {
         write-host "Warning no production package found for $software." -ForegroundColor "Yellow"
     }
