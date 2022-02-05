@@ -10,7 +10,6 @@ echo "Using Directory: $($baseDirectory.fullname)"
 push-location
 Set-Location "C:\"
 
-<#
 foreach ($mydir in $baseDirectory.GetDirectories("*_*") ) {
     #Skip directories that start with an underscore
     if ( $mydir.Name.StartsWith("_") ) { continue }
@@ -55,7 +54,7 @@ foreach ($mydir in $baseDirectory.GetDirectories() ) {
 
 write-host "Done creating apps"
 timeout 60
-#>
+
 
 
 

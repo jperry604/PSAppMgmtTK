@@ -1,20 +1,23 @@
 #import-module "C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole\bin\ConfigurationManager.psd1"
 [CmdletBinding()]
 Param (
-	[Parameter(Mandatory=$false)]
-	[string]$PathToApp="\\mecm\SOURCES\AppInstallersManaged\ITS_StartMenuLayout",
-    [Parameter(Mandatory=$false)]
-	[string]$PathToAppPackage="\\mecm\SOURCES\AppInstallersManaged\ITS_StartMenuLayout\ITS_StartMenuLayout_1.1.0_R1",
+	[Parameter(Mandatory=$true)]
+	[string]$PathToApp,
+    [Parameter(Mandatory=$true)]
+	[string]$PathToAppPackage,
     [Parameter(Mandatory=$false)]
     [datetime]$AvailableDateTime=(get-date).AddMinutes(30),
     [Parameter(Mandatory=$false)]
-    [datetime]$DeadlineDateTime=(Get-Date -Hour 23 -Minute 59 -Second 0 ) #Default Midnight tonight
+    [datetime]$DeadlineDateTime=(Get-Date -Hour 23 -Minute 59 -Second 0 ), #Default Midnight tonight
+    [Parameter(Mandatory=$false)]
+    [Boolean]$ReplaceOtherVersionsInTSs=$true
 )
 import-module (join-path "$env:SMS_ADMIN_UI_PATH\..\" ConfigurationManager.psd1)
 
 $RegPSAppMgmtTKKey = "HKLM:\Software\ITS\PSAppMgmtTK"
 $RegPSAppMgmtTKValue = "BaseDirectory"
 $BaseDirectory = Get-ItemPropertyValue -path $RegPSAppMgmtTKKey $RegPSAppMgmtTKValue
+. "${BaseDirectory}\_Lib\PSAppMgmtLib\ReplaceApplicationInTaskSequences.ps1"
 
 push-location
 Set-Location "C:\"
@@ -87,9 +90,20 @@ foreach($server in $GeneralSettings.MECM.Servers){
     }
     
 }
+if ($ReplaceOtherVersionsInTSs){
+    foreach($previousproductionPackageStr in $AppSettings.ProductionPackages){
+        if ($previousproductionPackageStr -eq "$CMAPPName"){continue}
+
+        #Record status of retiring app deployments.
+        $previousproductionPackage = Get-CMApplication -Name "$previousproductionPackageStr" -ea SilentlyContinue
+        ReplaceApplicationInTaskSequences -OldApplication $previousproductionPackage -NewApplication $CMAPP
+    }
+}
+
 pop-location
 
 #Update dependancies. (depenants)
+<#
 $CMAPPType = Get-CMDeploymentType -InputObject $CMAPP
 $DependancyGroups = Get-CMDeploymentTypeDependencyGroup -InputObject $CMAPPType
 Get-CMDeploymentTypeDependency -InputObject $DependancyGroups
@@ -100,11 +114,8 @@ New-CMDeploymentTypeDependencyGroup
 
 Add-CMDeploymentTypeDependency
 
-#Automatically update or remove an application in all of your ConfigMgr task sequences - Jose Espitia
-# https://www.joseespitia.com/2020/05/08/automatically-update-or-remove-an-application-in-all-of-your-configmgr-task-sequences/
-
 $dependancyGRP[0].Rule.Expression    
-
+#>
 
 #Update the json file
 #$AppSettings = Get-Content -Path (join-path $PathToApp AppSettings.json) | ConvertFrom-Json

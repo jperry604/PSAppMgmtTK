@@ -9,7 +9,7 @@
         "Servers": [
             {
                 "FQDN":"MECM.Contoso.com",
-                "SiteCode":"DNV",
+                "SiteCode":"SMS1",
                 "BaseCollections":[
                     {"Type":"APPi","BaseCollectionName":"APPi-PSAppMgmtTK-LC"},
                     {"Type":"APPu","BaseCollectionName":"APPu-PSAppMgmtTK-LC"},

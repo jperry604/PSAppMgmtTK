@@ -1,8 +1,8 @@
 # Requires Configuration manager console installed.
 [CmdletBinding()]
 Param (
-	[Parameter(Mandatory=$false)]
-	[string]$PathToApp="\\mecm\SOURCES\AppInstallersManaged\ITS_StartMenuLayout",
+	[Parameter(Mandatory=$true)]
+	[string]$PathToApp,
     [Parameter(Mandatory=$false)]
     [int]$RefreshType =2 ## 6 = Incremental and Scheduled Updates             # 4 = Incremental Updates Only             # 2 = Scheduled Updates only             # 1 = Manual Update only 
 )

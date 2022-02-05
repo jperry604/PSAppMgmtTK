@@ -1,12 +1,14 @@
 ﻿#import-module "C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole\bin\ConfigurationManager.psd1"
 [CmdletBinding()]
 Param (
-	[Parameter(Mandatory=$false)]
-	[string]$PathToApp="\\mecm\SOURCES\AppInstallersManaged\ITS_StartMenuLayout",
+	[Parameter(Mandatory=$true)]
+	[string]$PathToApp,
+    [Parameter(Mandatory=$true)]
+	[string]$PathToAppPackage,
     [Parameter(Mandatory=$false)]
-	[string]$PathToAppPackage="\\mecm\SOURCES\AppInstallersManaged\ITS_StartMenuLayout\ITS_StartMenuLayout_1.1.0_R1",
+    [int]$RefreshType =2, ## 6 = Incremental and Scheduled Updates             # 4 = Incremental Updates Only             # 2 = Scheduled Updates only             # 1 = Manual Update only 
     [Parameter(Mandatory=$false)]
-    [int]$RefreshType =2 ## 6 = Incremental and Scheduled Updates             # 4 = Incremental Updates Only             # 2 = Scheduled Updates only             # 1 = Manual Update only 
+    [Boolean]$AddOtherVersionsDependencies=$false
 )
 import-module (join-path "$env:SMS_ADMIN_UI_PATH\..\" ConfigurationManager.psd1)
 
@@ -107,8 +109,32 @@ foreach($server in $GeneralSettings.MECM.Servers){
         }
     }
 
+
+
     if(-not ($CMAPP.PackageID)){
         $CMAPP = Get-CMApplication -Name "$displayName" -ea SilentlyContinue
+    }
+
+    if ($AddOtherVersionsDependencies){
+        write-host "Todo - Add depenedencies found in other versions." -ForegroundColor "Magenta"
+        foreach($previousproductionPackageStr in $AppSettings.ProductionPackages){
+            if ($previousproductionPackageStr -eq "$CMAPPName"){continue}
+
+            $CMAPPPrevious = Get-CMApplication -Name "$previousproductionPackageStr" -ea SilentlyContinue
+            $CMAPPTypePrevious = Get-CMDeploymentType -InputObject $CMAPPPrevious
+            $DependancyGroupsPrevious = Get-CMDeploymentTypeDependencyGroup -InputObject $CMAPPTypePrevious
+            foreach($DependancyGroupPrevious in $DependancyGroupsPrevious){
+                if($CMAPPTypePrevious.ModelName -eq $DependancyGroupPrevious.ParentDeploymentTypeModelName){continue}
+                Get-CMDeploymentTypeDependency -InputObject $DependancyGroupPrevious
+                $Dependency = Get-CMDeploymentTypeDependency -InputObject $dependancyGRP[0]
+            }
+          
+            
+
+            Get-CMDeploymentType -ApplicationName MyApp | New-CMDeploymentTypeDependencyGroup -GroupName MyGroup | Add-CMDeploymentTypeDependency -DeploymentTypeDependency (Get-CMDeploymentType -ApplicationName MyChildApp) -IsAutoInstall $true
+
+
+        }
     }
         
 

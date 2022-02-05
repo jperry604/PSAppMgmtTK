@@ -3,11 +3,10 @@
 #import-module "C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole\bin\ConfigurationManager.psd1"
 [CmdletBinding()]
 Param (
-	[Parameter(Mandatory=$false)]
-    [string]$PathToApp="\\mecm\SOURCES\AppInstallersManaged\Microsoft_Visual C++ 2015-2022 Redistributable (x64)",
-	#[string]$PathToApp="\\mecm\SOURCES\AppInstallersManaged\ITS_StartMenuLayout",
-    [Parameter(Mandatory=$false)]
-	[string]$PathToAppPackage="\\mecm\SOURCES\AppInstallersManaged\ITS_StartMenuLayout\ITS_StartMenuLayout_1.1.0_R1",
+	[Parameter(Mandatory=$true)]
+	[string]$PathToApp,
+    [Parameter(Mandatory=$true)]
+	[string]$PathToAppPackage,
     [Parameter(Mandatory=$false)]
     [datetime]$AvailableDateTime=(get-date).AddMinutes(30),
     [Parameter(Mandatory=$false)]
@@ -15,13 +14,19 @@ Param (
     [Parameter(Mandatory=$false)]
     [Boolean]$RetireOtherVersions=$true,
     [Parameter(Mandatory=$false)]
-    [Boolean]$ReplaceOtherVersionsInTSs=$true
+    [Boolean]$ReplaceOtherVersionsInTSs=$true,
+    [Parameter(Mandatory=$false)]
+    [Boolean]$ReplaceOtherVersionsDependents=$true
 )
 import-module (join-path "$env:SMS_ADMIN_UI_PATH\..\" ConfigurationManager.psd1)
+
 
 $RegPSAppMgmtTKKey = "HKLM:\Software\ITS\PSAppMgmtTK"
 $RegPSAppMgmtTKValue = "BaseDirectory"
 $BaseDirectory = Get-ItemPropertyValue -path $RegPSAppMgmtTKKey $RegPSAppMgmtTKValue
+. "${BaseDirectory}\_Lib\PSAppMgmtLib\ApplicationDeploymentStatusReport.ps1"
+. "${BaseDirectory}\_Lib\PSAppMgmtLib\ReplaceApplicationInTaskSequences.ps1"
+
 
 push-location
 Set-Location "C:\"
@@ -29,7 +34,7 @@ $GeneralSettings = Get-Content -Path (join-path $BaseDirectory "_ComputerAppMgmt
 $AppSettings = Get-Content -Path (join-path $PathToApp AppSettings.json) | ConvertFrom-Json
 $VersionedAppSettings = Get-Content -Path (join-path $PathToAppPackage VersionedAppSettings.json) | ConvertFrom-Json
 
-
+$ScriptStartDateTime = get-date -format yyyy-MM-ddTHH-mm-ss
 
 
 
@@ -107,9 +112,120 @@ foreach($server in $GeneralSettings.MECM.Servers){
             }
         }
     }
+
+    #Update depenants
+    if($ReplaceOtherVersionsDependents){
+        write-host "Todo - Add depenedencies found in other versions." -ForegroundColor "Magenta"
+        <#
+          #$ApplicationName = (Get-WmiObject -Class SMS_ApplicationLatest `
+            #-Namespace root/SMS/site_$($SiteCode) -ComputerName $SiteServer `
+            #-Filter "CI_ID='$ApplicationCIID'").LocalizedDisplayName
+            ##tesing ITS_FileAssociationDefaults_1.1.0_R1
+
+        #this is wrong and finds dependancies
+        foreach($previousproductionPackageStr in $AppSettings.ProductionPackages){
+            if ($previousproductionPackageStr -eq "$CMAPPName"){continue}
+
+            $CMAPPPrevious = Get-CMApplication -Name "$previousproductionPackageStr" -ea SilentlyContinue
+            $CMAPPTypePrevious = Get-CMDeploymentType -InputObject $CMAPPPrevious
+            $DependancyGroupsPrevious = Get-CMDeploymentTypeDependencyGroup -InputObject $CMAPPTypePrevious
+            foreach($DependancyGroupPrevious in $DependancyGroupsPrevious){
+                if($CMAPPTypePrevious.ModelName -eq $DependancyGroupPrevious.ParentDeploymentTypeModelName){continue}
+                Get-CMDeploymentTypeDependency -InputObject $DependancyGroupPrevious
+                $Dependency = Get-CMDeploymentTypeDependency -InputObject $dependancyGRP[0]
+            }
+          
+            
+
+            Get-CMDeploymentType -ApplicationName MyApp | New-CMDeploymentTypeDependencyGroup -GroupName MyGroup | Add-CMDeploymentTypeDependency -DeploymentTypeDependency (Get-CMDeploymentType -ApplicationName MyChildApp) -IsAutoInstall $true
+
+
+        }
+        #>
+    }
+    if ($ReplaceOtherVersionsInTSs){
+        foreach($previousproductionPackageStr in $AppSettings.ProductionPackages){
+            if ($previousproductionPackageStr -eq "$CMAPPName"){continue}
+
+            #Record status of retiring app deployments.
+            $previousproductionPackage = Get-CMApplication -Name "$previousproductionPackageStr" -ea SilentlyContinue
+            ReplaceApplicationInTaskSequences -OldApplication $previousproductionPackage -NewApplication $CMAPP
+        }
+    }
+
+    if ($RetireOtherVersions){
+        $previousPackagesArray = $AppSettings.ProductionPackages + $AppSettings.EarlyAdopterPackages
+        $AppSettings.ProductionPackages 
+        $AppSettingsEarlyAdopterPackages
+        $previousPackagesArray
+        foreach($previousproductionPackageStr in $previousPackagesArray){
+            if ($previousproductionPackageStr -eq "$CMAPPName"){continue}
+
+            #Record status of retiring app deployments.
+            $previousproductionPackage = Get-CMApplication -Name "$previousproductionPackageStr" -ea SilentlyContinue
+            $PreviousDeployments = $previousproductionPackage   | get-cmApplicationdeployment  -ea SilentlyContinue
+            Foreach ($PreviousDeployment in $PreviousDeployments) {
+                #Make record of previous deployment
+                $AppDeploymentReportObj = Get-CMAppDeploymentReport -DetailLevel Both -OutputType Object -AssignmentID $PreviousDeployment.AssignmentID -Namespace "root\sms\site_$($server.SiteCode)" -Server $server.FQDN
+                $ReportFileName = "${ScriptStartDateTime}_$($AppDeploymentReportObj.SummaryResults.SoftwareName)_$($AppDeploymentReportObj.SummaryResults.CollectionName.replace("-${publisher}_${app}", """" ))_S$($AppDeploymentReportObj.SummaryResults.NumberSuccess)_F$($AppDeploymentReportObj.SummaryResults.NumberErrors)"
+                if (($AppDeploymentReportObj.SummaryResults.NumberSuccess -eq 0) -and `
+                    ($AppDeploymentReportObj.SummaryResults.NumberInProgress -eq 0) -and `
+                    ($AppDeploymentReportObj.SummaryResults.NumberUnknown -eq 0) -and `
+                    ($AppDeploymentReportObj.SummaryResults.NumberErrors -eq 0)
+                ){
+                    write-host "No data for: $ReportFileName" #don't document deployments without any targets
+                } else {
+                    Set-Location "C:\"
+                    $ReportDirectory = "${BaseDirectory}\_ComputerAppMgmt\_Logs"
+                    If(!(test-path $ReportDirectory )){
+                        New-Item -ItemType Directory -Force -Path $ReportDirectory 
+                    }
+
+                    
+                    $AppDeploymentReportObj.SummaryResults
+                    $AppDeploymentReportObj.SummaryResults | Export-CSV "$ReportDirectory\${ReportFileName}-Summary.csv"
+                    $AppDeploymentReportObj.DetailResults  | Export-CSV "$ReportDirectory\${ReportFileName}.csv"
+
+                }
+                
+                #Remove deployment
+                # https://docs.microsoft.com/en-us/powershell/module/configurationmanager/remove-cmdeployment?view=sccm-ps
+                Set-Location "$($server.SiteCode):\"
+                Remove-CMDeployment -InputObject $PreviousDeployment
+            }
+            
+
+            
+
+            
+            
+
+            #Remove dependencies
+            #https://docs.microsoft.com/en-us/powershell/module/configurationmanager/remove-cmdeploymenttypedependency?view=sccm-ps
+
+
+
+            #superseded apps.
+            #https://docs.microsoft.com/en-us/powershell/module/configurationmanager/remove-cmdeploymenttypesupersedence?view=sccm-ps
+            
+        }
+    }
+
 }
 
 pop-location
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #Update the json file
@@ -119,15 +235,3 @@ if(-not ($AppSettings.ProductionPackages.contains($displayName))){
     $AppSettings.ProductionPackages += $displayName
     ConvertTo-Json $AppSettings -Depth 50  | Out-file (join-path $PathToApp AppSettings.json)
 }
-
-#Automatically update or remove an application in all of your ConfigMgr task sequences - Jose Espitia
-# https://www.joseespitia.com/2020/05/08/automatically-update-or-remove-an-application-in-all-of-your-configmgr-task-sequences/
-
-
-#Update dependancies. (depenants)
-# Done when early adopters
-
-
-
-#Record status of retiring app deployments.
-#Get-CMApplicationDeploymentStatus

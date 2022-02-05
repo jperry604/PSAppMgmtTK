@@ -1,11 +1,10 @@
 #import-module "C:\Program Files (x86)\Microsoft Configuration Manager\AdminConsole\bin\ConfigurationManager.psd1"
 [CmdletBinding()]
 Param (
-	[Parameter(Mandatory=$false)]
-	#[string]$PathToApp="\\mecm\SOURCES\AppInstallersManaged\Microsoft_Visual C++ 2015-2022 Redistributable (x64)",
-    [string]$PathToApp="\\mecm\SOURCES\AppInstallersManaged\ITS_StartMenuLayout",
-    [Parameter(Mandatory=$false)]
-	[string]$PathToAppPackage="\\mecm\SOURCES\AppInstallersManaged\ITS_StartMenuLayout\ITS_StartMenuLayout_1.1.0_R1",
+	[Parameter(Mandatory=$true)]
+    [string]$PathToApp,
+    [Parameter(Mandatory=$true)]
+	[string]$PathToAppPackage,
     [Parameter(Mandatory=$false)]
     [datetime]$AvailableDateTime=(get-date).AddMinutes(30),
     [Parameter(Mandatory=$false)]
