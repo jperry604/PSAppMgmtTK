@@ -50,6 +50,11 @@ if (Test-Path $folderPath -PathType Container) {
 	New-Item -Path $registryPath -Force
 	Set-ItemProperty -Path $registryPath -Name "LockScreenImage" -Value $bestMatchFile.FullName
 	Set-ItemProperty -Path $registryPath -Name "NoChangingLockScreen" -Value 1
+	
+	$registryPath = "HKLM:Software\Policies\Microsoft\Windows\Cloud"
+	New-Item -Path $registryPath -Force
+	Set-ItemProperty -Path $registryPath -Name "DisableWindowsSpotlightFeatures" -Value 1
+	
     } else {
         Write-Host "No matching image found."
     }
